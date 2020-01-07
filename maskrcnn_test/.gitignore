@@ -1,0 +1,11 @@
+build/
+logs/
+read_show.py
+demo/*.pth
+*.pkl
+last_checkpoint
+*.pth
+*.pyc
+training_milestone_checkpoint/
+.idea
+demo/Done_dataset

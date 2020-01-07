@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Mirrors</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>Mirrors <img src="images/mirrors1.jpg"> <img src="images/mirrors2.jpg"></h1>
+
+
+<p>The mirror objects in V-REP can have two distinct functions:</p>
+<li>they can act as mirrors and will reflect images/light</li>
+<li>they can also act as  auxiliary clipping planes. A clipping plane forbids rendering past a specific plane in space, effectively &quot;cutting&quot; into the view and allowing to look inside of closed objects. The clipping plane function can be applied to the whole <a href="scenes.htm">scene</a>, or to a specific <a href="entities.htm">entity</a>.</li>
+
+<p>Following images illustrate the dual functions of mirrors:</p>
+
+<p align=center><img src="images/mirrors3.jpg"></p>
+<p class=imageLabel>[Mirror functions: a) as regular mirrors, b) as auxiliary clipping planes]</p>
+<br>
+
+<p>The effect of mirrors can be seen when looking through a <a href="cameras.htm">camera</a>, or when displaying the image content of a <a href="visionSensors.htm">vision sensor</a> (since mirrors are <a href="renderableObjects.htm">renderable objects</a>). Old graphic cards might not correctly support mirrors.</p>
+<p>Use mirrors with caution: they slow down the scene display, and won't reflect other mirrors. You can however have as many mirrors as needed. Clipping planes on the other hands are limited to a maximum of 5, or even less depending on your graphic card capabilities.
+</p>
+
+
+<p>Mirrors are added to the <a href="scenes.htm">scene</a> with [Menu bar --&gt; Add --&gt; Mirror].<br>
+</p>
+
+
+<br>
+<h3 class=recommendedTopics>Recommended topics</h3>
+<li><a href="mirrorPropertiesDialog.htm">Mirror properties</a></li>
+
+<br>
+<br>
+
+ </tr>
+</table> 
+</div>  
+  
+  
+</body>
+
+</html>

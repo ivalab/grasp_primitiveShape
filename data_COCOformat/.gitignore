@@ -1,0 +1,10 @@
+test/
+train/
+raw/
+val/
+archive/
+*.zip
+.idea
+Dataset
+*.tar.gz
+useless

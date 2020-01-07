@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>simSetVisionSensorFilter</title>
+<link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../../index.html" TARGET="_top"><img src="../images/homeImg.png"></a></p>
+
+<h1><a href="../apiOverview.htm">Regular API</a> function</h1>
+<h3 class=subsectionBar><a name="simSetVisionSensorFilter" id="simSetVisionSensorFilter"></a>simSetVisionSensorFilter / sim.setVisionSensorFilter </h3>
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Sets the parameters and settings of a specific <a href="../visionSensorFilterComposition.htm">filter component</a> of a <a href="../visionSensors.htm">vision sensor</a>. See also <a href="simGetVisionSensorFilter.htm">sim.getVisionSensorFilter</a> and the other <a href="../apiFunctionListCategory.htm#visionSensor">vision sensor related API functions</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCSyn>
+C synopsis
+</td> 
+<td class=apiTableRightCSyn>simInt simSetVisionSensorFilter(simInt visionSensorHandle,simInt filterIndex,simInt options,const simInt* pSizes,const simUChar* bytes,const simInt* ints,const simFloat* floats,const simUChar* custom)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCParam>C parameters</td> 
+<td class=apiTableRightCParam>
+<div><strong>visionSensorHandle</strong>: handle of a vision sensor. See also <a href="simGetObjectHandle.htm">simGetObjectHandle</a>.</div>
+<div><strong>filterIndex</strong>: the zero-based index of the filter position.</div>
+<div><strong>options</strong>: bit-coded value:</div>
+<div class=tab>bit 0 set (1): the component is enabled</div>
+<div><strong>pSizes</strong>: a pointer to 4 integer values indicating the sizes of the provided buffers (see next 4 arguments).</div>
+<div><strong>bytes</strong>: a buffer of bytes values representing the byte parameters of the filter component.</div>
+<div><strong>ints</strong>: a buffer of ints values representing the int parameters of the filter component.</div>
+<div><strong>floats</strong>: a buffer of floats values representing the float parameters of the filter component.</div>
+<div><strong>custom</strong>: a buffer of bytes values representing the custom parameters of the filter component.</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCRet>
+C return value
+</td> 
+<td class=apiTableRightCRet>
+<div>-1 in case of an error, 0 if the <em>filterIndex</em> is not valid, otherwise the <a href="../apiConstants.htm#filterComponents">type of filter component</a> pointed by the <em>filterIndex</em>.</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLSyn>
+Lua synopsis
+</td> 
+<td class=apiTableRightLSyn>number filterType=sim.setVisionSensorFilter(number sensorHandle,number filterIndex,number options,table byteVals,table intVals,table floatVals,string customBuffer)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLParam>Lua parameters</td> 
+<td class=apiTableRightLParam>
+<div>Similar as C-function</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLRet>
+Lua return values
+</td> 
+<td class=apiTableRightLRet>
+<div>Same as C-function</div>
+</td> 
+</tr> 
+</table> 
+
+<br>
+<p><a href="../apiFunctions.htm">All regular API functions on one page</a></p>
+<br>
+<br>
+</td>
+</tr>
+</table>
+</div>
+</body>
+</html>

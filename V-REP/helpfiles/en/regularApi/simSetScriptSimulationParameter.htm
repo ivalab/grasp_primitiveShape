@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>simSetScriptSimulationParameter</title>
+<link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../../index.html" TARGET="_top"><img src="../images/homeImg.png"></a></p>
+
+<h1><a href="../apiOverview.htm">Regular API</a> function</h1>
+<h3 class=subsectionBar><a name="simSetScriptSimulationParameter" id="simSetScriptSimulationParameter"></a>simSetScriptSimulationParameter / sim.setScriptSimulationParameter </h3>
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Sets a main script's or child script's parameter in its simulation parameter list. Useful for simple interaction with the user or for simple parameter exchange with other scripts. See also <a href="simGetScriptSimulationParameter.htm">sim.getScriptSimulationParameter</a> and the <a href="../apiFunctionListCategory.htm#packing">data packing/unpacking functions</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCSyn>
+C synopsis
+</td> 
+<td class=apiTableRightCSyn>simInt simSetScriptSimulationParameter(simInt scriptHandle,const simChar* parameterName,const simChar* parameterValue,simInt parameterLength)<br></td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCParam>C parameters</td> 
+<td class=apiTableRightCParam>
+<div><strong>scriptHandle</strong>: handle of the script, or sim_handle_main_script or sim_handle_all</div>
+<div><strong>parameterName</strong>: name of the parameter to set</div>
+<div><strong>parameterValue</strong>: value of the parameter (all parameters are treated as strings, but can be converted to number later on. Strings may contain any values (also embedded zeros))<br>
+</div>
+<div><strong>parameterLength</strong>: number of bytes that parameterValue contains. If parameterValue is a regular string (without embedded zeros), then this is strlen(parameterValue).<br>
+</div>
+<div></div></td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCRet>
+C return value
+</td> 
+<td class=apiTableRightCRet>
+<div>number of parameters that were set (can be &gt;1 if sim_handle_all was specified) or -1 if the parameterName could not be found or in case of an error<br>
+</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLSyn>
+Lua synopsis
+</td> 
+<td class=apiTableRightLSyn>number setCount=sim.setScriptSimulationParameter(number scriptHandle,string parameterName,string/number parameterValue)<br></td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLParam>Lua parameters</td> 
+<td class=apiTableRightLParam><div><strong>scriptHandle</strong>: handle of the script, or sim.handle_main_script, sim.handle_all, sim.handle_tree, sim.handle_chain or sim.handle_self</div>
+<div><strong>parameterName</strong>: Same as C-function</div>
+<div><strong>parameterValue</strong>: Same as C-function</div>
+<div></div></td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLRet>
+Lua return values
+</td> 
+<td class=apiTableRightLRet>
+<div>Same as C-function</div>
+<div></div></td> 
+</tr> 
+</table> 
+
+<br>
+<p><a href="../apiFunctions.htm">All regular API functions on one page</a></p>
+<br>
+<br>
+</td>
+</tr>
+</table>
+</div>
+</body>
+</html>

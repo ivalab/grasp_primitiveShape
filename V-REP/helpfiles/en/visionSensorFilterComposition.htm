@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Vision sensor filter composition</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>Vision sensor filter composition</h1>
+
+
+<p>A <a href="visionSensors.htm">vision sensor</a> normally produces two images at each simulation pass: a color image and a depth map. Those two images can be programmatically inspected by retrieving them through appropriate <a href="apisOverview.htm">API</a> function calls, then iterating over each individual pixel or depth map value. While this approach allows a maximum of flexibility, it is however troublesome and impractical. Instead, it is much more convenient (and fast!) to use the built-in filtering and triggering capabilities. Indeed, each vision sensor has a filter associated, that can be composed in a very flexible way by combining several components. Following figure illustrates a simple filter that inverts colors:
+</p>
+
+
+<p align=center><img src="images/visionSensorFilters1.jpg"></p>
+<p class=imageLabel>[Vision sensor filter with 3 components]</p>
+<br>
+
+<p>A component can perform 4 basic operations: <br>
+</p>
+
+<li>Transfer data from one buffer to another (e.g. <em>transfer input image to work image</em>) </li>
+
+<li>Perform operations on one or more buffers (e.g. <em>invert work image</em>) </li>
+
+<li>Activate a trigger (e.g. <em>if average image intensity &gt; 0.3 then activate trigger</em>) </li>
+
+<li>Return specific values that can be accessed through an API call (e.g. <em>return the position of the center of mass of a binary image</em>) </li>
+
+
+<p>Following figure illustrates the various types of buffers a component can access:<br>
+</p>
+
+<p align=center><img src="images/visionSensorFilters2.jpg"></p>
+<p class=imageLabel>[Vision sensor buffers and operations between buffers]</p>
+<br>
+
+<p>While the input image and input depth image are volatile buffers (i.e. normally automatically overwritten with new data at each simulation pass), the work image, buffer1 image and buffer2 image are persistent buffers (i.e. their content is not modified unless a component operates on them, e.g. persistent buffers can be used to compare vision sensor data from one simulation pass to the next simulation pass).<br>
+</p>
+
+<p>A vision sensor is triggered if at least one component of its filter activates the trigger. The API function <a href="regularApi/simHandleVisionSensor.htm">sim.handleVisionSensor</a> (or <a href="regularApi/simReadVisionSensor.htm">sim.readVisionSensor</a>) returns the sensor's trigger state, and a series of values or <em>packets</em>. The first  packet may contain different data depending on the vision sensor settings:</p>
+<li><strong>15 auxiliary values</strong> (default): the values are calculated over all the image pixels and represent the minimum of intensity, red, green, blue, depth value, the maximum of intensity, red, green, blue, depth value, and the average of intensity, red, green, blue, depth value. On a higher resolution image, computation might slow down vision sensors, and if those values are not used, their calculation can be turned off in the <a href="visionSensorPropertiesDialog.htm">vision sensor properties</a> (<strong>Packet1 is blank (faster)</strong>)</li>
+
+<li><strong>15 blank values</strong>: the values do not represent anything. This happens when the option <strong>Packet1 is blank (faster)</strong> in the <a href="visionSensorPropertiesDialog.htm">vision sensor propreties</a> is turned on, in order to speed-up the operation of a vision sensor.</li>
+
+<li><strong>n values</strong>: the values represent the object handles of <em>seen</em> objects, when the vision sensor's <strong>render mode</strong> is <strong>object handles</strong> in the <a href="visionSensorPropertiesDialog.htm">vision sensor properties</a>. In that mode the object handles are coded/decoded as RGB values, in order to identify the object handles of all seen objects. The values in the returned packet should be rounded down.</li>
+
+<p>If additional filter components return values, then they will be appended as packets to the first packet. See the function's API description for more details.</p>
+
+<p>V-REP has more than 30 built-in filter components that can be combined as needed. In addition, new filter components can be developed through <a href="plugins.htm">plugins</a>. When a filter component from a plugin is used, then you should always distribute the created scene with the plugin, or you should make sure to check whether the plugin is present with the <a href="regularApi/simGetModuleName.htm">sim.getModuleName</a> API command in a <a href="childScripts.htm">child script</a> (or C-application). <br>
+</p>
+
+
+<br>
+<h3 class=recommendedTopics>Recommended topics</h3>
+<li><a href="visionSensors.htm">Vision sensors</a></li>
+<li><a href="visionSensorDescription.htm">Vision sensor types and mode of operation</a></li>
+<li><a href="visionSensorPropertiesDialog.htm">Vision sensor properties</a></li>
+
+<br>
+<br>
+
+
+ </tr>
+</table> 
+</div>  
+  
+  
+</body>
+
+</html>

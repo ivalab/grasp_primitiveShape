@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Mill properties</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>Mill properties</h1>
+
+<p>The mill properties are part of the <a href="sceneObjectPropertiesDialog.htm">scene object properties </a>dialog, which is located at [Menu bar --&gt; Tools --&gt; Scene object properties]. You can also open the dialog with a double-click on an object icon in the <a href="userInterface.htm#SceneHierarchy">scene hierarchy</a>, or with a click on its <a href="userInterface.htm#toolbars">toolbar</a> button:<br>
+</p>
+
+<p align=center><img src="images/objectPropertyToolbarButton.jpg"></p>
+<p class=imageLabel>[Scene object properties toolbar button]</p>
+<br>
+
+<p>In the scene object properties dialog, click  the <strong>Mill</strong> button to display the mill dialog (the <strong>Mill</strong> button only appears if the last selection is a <a href="mills.htm">mill</a><a href="forceSensors.htm"></a><a href="visionSensors.htm"></a><a href="proximitySensors.htm"></a><a href="graphs.htm"></a><a href="dummies.htm"></a><a href="joints.htm"></a><a href="shapes.htm"></a><a href="lights.htm"></a><a href="cameras.htm"></a><a href="paths.htm"></a>). The dialog displays the settings and parameters of the last selected mill. If more than one mill is selected, then some parameters can be copied from the last selected mill to the other selected mills (<strong>Apply to selection</strong>-buttons):
+</p>
+
+<p align=center><img src="images/millDialog1.jpg"></p>
+<p class=imageLabel>[Mill dialog]</p>
+<br>
+
+<li><strong>Enable all mills</strong>: enables or disables the mill functionality for all mills.
+</li>
+
+<li><strong>Explicit handling</strong>: indicates whether the mill should be explicitely handled. If checked, the mill will not be handled when sim.handleMill(sim.handle_all_except_explicit) is called, but only if sim.handleMill(sim.handle_all) or sim.handleMill(millHandle) is called. This is useful if the user wishes to handle the mill in a <a href="childScripts.htm">child script</a> rather than in the <a href="mainScript.htm">main script</a> (if not checked the mill will be handled twice, once when sim.handleMill(sim.handle_all_except_explicit) is called in the main script, and once when sim.handleMill(millHandle) is called in the child script). Refer also to the section on <a href="explicitHandling.htm">explicit and non-explicit calls</a>.<br>
+</li>
+
+
+
+<li><strong>Entity to cut</strong>: allows specifying what <a href="entities.htm">entity</a> should be cut. Remember that only appropriately tagged <a href="cuttableObjects.htm">cuttable objects</a> will be cut (refer to the <strong>cuttable</strong> option in the <a href="commonPropertiesDialog.htm">object common  properties</a>).<br>
+</li>
+
+<li><strong>Show volume parameters</strong>: Toggles the <a href="millVolumeDialog.htm">mill volume dialog</a>. That dialog allows to customize a mill's cutting volume.
+</li>
+
+<li><strong>Size</strong>: the size of the mill base. This has no functional effect.
+</li>
+
+<li><strong>Colors</strong>: allows adjusting the color of the various elements of a mill.
+</li>
+
+
+
+
+<br>
+<h3 class=recommendedTopics>Recommended topics</h3>
+<li><a href="mills.htm">Mills</a></li>
+<li><a href="millDescription.htm">Mill types and mode of operation</a></li>
+<li><a href="millVolumeDialog.htm">Mill volume dialog</a></li>
+<li><a href="cuttableObjects.htm">Cuttable objects</a></li>
+<li><a href="commonPropertiesDialog.htm">Object common properties</a></li>
+
+<br>
+<br>
+
+ </tr>
+</table> 
+</div>  
+  
+  
+</body>
+
+</html>

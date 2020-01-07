@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>simGetScriptSimulationParameter</title>
+<link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../../index.html" TARGET="_top"><img src="../images/homeImg.png"></a></p>
+
+<h1><a href="../apiOverview.htm">Regular API</a> function</h1>
+<h3 class=subsectionBar><a name="simGetScriptSimulationParameter" id="simGetScriptSimulationParameter"></a>simGetScriptSimulationParameter / sim.getScriptSimulationParameter </h3>
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves a main script's or child script's parameter from its simulation parameter list. Useful for simple interaction with the user, or for simple parameter exchange with other scripts. See also <a href="simSetScriptSimulationParameter.htm">sim.setScriptSimulationParameter</a>, and the <a href="../apiFunctionListCategory.htm#packing">data packing/unpacking functions</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCSyn>
+C synopsis
+</td> 
+<td class=apiTableRightCSyn>simChar* simGetScriptSimulationParameter(simInt scriptHandle,const simChar* parameterName,simInt* parameterLength)<br></td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCParam>C parameters</td> 
+<td class=apiTableRightCParam>
+<div><strong>scriptHandle</strong>: handle of the main script or child script, or sim_handle_main_script or sim_handle_all. When scriptHandle is sim_handle_all, the function returns only one matching parameter encountered (other matching parameters might be different)<br>
+</div>
+<div><strong>parameterName</strong>: name of the parameter to retrieve</div>
+<div><strong>parameterLength</strong>: the number of bytes that compose the value of the parameter (excluding the terminal zero)<br>
+</div>
+<div></div></td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCRet>
+C return value
+</td> 
+<td class=apiTableRightCRet>
+<div>value of the parameter or NULL if parameterName does not exist for the given script, or in case of an error. The user is in charge of releasing the returned value with <a href="simReleaseBuffer.htm">simReleaseBuffer</a>. The returned pointer points to parameterLength byte values, terminated by a terminal zero (the returned buffer may however contain several embedded zeros).<br>
+</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLSyn>
+Lua synopsis
+</td> 
+<td class=apiTableRightLSyn>
+<div>(1) boolean/number/string parameterValue=sim.getScriptSimulationParameter(number scriptHandle,string parameterName,boolean forceStringReturn=false)</div>
+<div>2) table parameterValues,table scriptHandles=sim.getScriptSimulationParameter(number targetScripts,string parameterName,boolean forceStringReturn=false)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLParam>Lua parameters</td> 
+<td class=apiTableRightLParam>
+<div>(1) <strong>scriptHandle</strong>: handle of the script, or sim.handle_main_script or sim_handle_self.
+</div>
+<div>(2) <strong>targetScripts</strong>: sim.handle_all, sim.handle_tree or sim.handle_chain (with sim.handle_tree and sim.handle_chain the calling script is excluded).
+</div>
+<div>
+ <strong>parameterName</strong>: name of the parameter to retrieve.
+</div>
+<div>
+ <strong>forceStringReturn</strong>: forces the return of a string (i.e. raw value). False by default. If false, then the returned string will be converted to nil, false, true, a number or a string as appropriate (and in that order).
+</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLRet>
+Lua return values
+</td> 
+<td class=apiTableRightLRet>
+<div>(1) <strong>parameterValue</strong>: value of the parameter, or nil in case of an error (or if that value is nil!).</div>
+<div>(2) <strong>parameterValues</strong>: table of parameter values or nil if no such parameter was found or in case of an error. <strong>scriptHandles</strong>: table of script handles associated with the parameter values (i.e. parameterValue[i] comes from the script with handle scriptHandles[i]) or nil if no such parameter was found or in case of an error.<br>
+</div>
+<br>
+<div>If the returned parameter value is a string, then it might contain any values (also embedded zeros)</div>
+</td> 
+</tr> 
+</table> 
+
+<br>
+<p><a href="../apiFunctions.htm">All regular API functions on one page</a></p>
+<br>
+<br>
+</td>
+</tr>
+</table>
+</div>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>simApplyMilling</title>
+<link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../../index.html" TARGET="_top"><img src="../images/homeImg.png"></a></p>
+
+<h1><a href="../apiOverview.htm">Regular API</a> function</h1>
+<h3 class=subsectionBar><a name="simApplyMilling" id="simApplyMilling"></a>simApplyMilling / sim.applyMilling </h3>
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Applies changes made during milling operations to a cuttable object (e.g. a shape). This requires some calculation time. Once changes were applied, they cannot be reset anymore. If the milling operation milled away the whole object, then the object is removed from the scene. The calculation structure linked to the object is removed and an updated calculation structure might be calculated (might take some calculation time). See also <a href="simResetMilling.htm">sim.resetMilling</a>, <a href="simHandleMill.htm">sim.handleMill</a> and <a href="simResetMill.htm">sim.resetMill</a>.<br></td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCSyn>
+C synopsis
+</td> 
+<td class=apiTableRightCSyn>simInt simApplyMilling(simInt objectHandle)<br></td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCParam>C parameters</td> 
+<td class=apiTableRightCParam>
+<div><strong>objectHandle</strong>: handle of the cut object or sim_handle_all to apply changes to all cut objects. <br>
+</div>
+<div></div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCRet>
+C return value
+</td> 
+<td class=apiTableRightCRet>
+<div>-1 if operation was not successful, 0 if operation was successful but the object was removed from the scene (because entirely cut away) (only available when sim_handle_all is not specified), or 1 if operation was successful and the object still exists in the scene.<br>
+</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLSyn>
+Lua synopsis
+</td> 
+<td class=apiTableRightLSyn>number result=sim.applyMilling(number objectHandle)<br></td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLParam>Lua parameters</td> 
+<td class=apiTableRightLParam>
+<div>Same as C-function</div>
+<div></div></td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLRet>
+Lua return values
+</td> 
+<td class=apiTableRightLRet>
+<div>Same as C-function</div>
+<div></div>
+</td> 
+</tr> 
+</table> 
+
+<br>
+<p><a href="../apiFunctions.htm">All regular API functions on one page</a></p>
+<br>
+<br>
+</td>
+</tr>
+</table>
+</div>
+</body>
+</html>

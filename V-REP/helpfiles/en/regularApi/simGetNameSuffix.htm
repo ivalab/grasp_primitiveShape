@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>simGetNameSuffix</title>
+<link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../../index.html" TARGET="_top"><img src="../images/homeImg.png"></a></p>
+
+<h1><a href="../apiOverview.htm">Regular API</a> function</h1>
+<h3 class=subsectionBar><a name="simGetNameSuffix" id="simGetNameSuffix"></a>simGetNameSuffix / sim.getNameSuffix </h3>
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Returns the name suffix for an object name (e.g. &quot;myRobot#42&quot;'s name suffix is 42), or retrieves the name suffix set for the current script or for c/c++ API calls. See also <a href="simSetNameSuffix.htm">sim.setNameSuffix</a>, and read the section on <a href="../accessingGeneralObjects.htm">accessing general-type objects</a>.<br></td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCSyn>
+C synopsis
+</td> 
+<td class=apiTableRightCSyn>simInt simGetNameSuffix(const simChar* nameWithSuffix)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCParam>C parameters</td> 
+<td class=apiTableRightCParam>
+<div><strong>nameWithSuffix</strong>: full name (e.g. &quot;myRobot#42&quot;), or NULL to retrieve the name suffix for all c/c++ API calls<br>
+</div>
+<div></div></td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCRet>
+C return value
+</td> 
+<td class=apiTableRightCRet>
+<div>Name suffix of nameWithSuffix, or current name suffix for c/c++ API calls</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLSyn>
+Lua synopsis
+</td> 
+<td class=apiTableRightLSyn>
+<div>(1) number nameSuffix,string name=sim.getNameSuffix(string nameWithSuffix): retieves the name suffix of nameWithSuffix<br>
+</div>
+<div>(2) number nameSuffix=sim.getNameSuffix(nil): retrieves the name suffix set for current script<br>
+</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLParam>Lua parameters</td> 
+<td class=apiTableRightLParam>
+<div></div>
+<div><strong>nameWithSuffix</strong>: full name (e.g. &quot;myRobot#42&quot;)</div>
+<div></div></td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLRet>
+Lua return values
+</td> 
+<td class=apiTableRightLRet>
+<div></div>
+<div><strong>nameSuffix</strong>: name suffix (e.g. 42) of nameWithSuffix, or name suffix that is set for current script</div>
+<div><strong>name</strong>: name without suffix (e.g. &quot;myRobot&quot;) or nil if the sim.getNameSuffix argument was nil</div>
+<div></div></td> 
+</tr> 
+</table> 
+
+<br>
+<p><a href="../apiFunctions.htm">All regular API functions on one page</a></p>
+<br>
+<br>
+</td>
+</tr>
+</table>
+</div>
+</body>
+</html>

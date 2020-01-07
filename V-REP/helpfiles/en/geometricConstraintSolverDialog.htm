@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Geometric constraint solver dialog</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>Geometric constraint solver dialog</h1>
+
+<p>The geometric constraint solver dialog is part of the <a href="calculationModuleDialog.htm">calculation module properties dialog</a>, which is located at [Menu bar --&gt; Tools --&gt; Calculation module properties]. You can also open the dialog with a click on its <a href="userInterface.htm#toolbars">toolbar</a> button:<br>
+</p>
+
+<p align=center><img src="images/calculationModuleButton.jpg"></p>
+<p class=imageLabel>[Calculation module properties toolbar button]</p>
+<br>
+
+<p>In the calculation module properties dialog, click  the <strong>Geometric constraint solver</strong> button to display the geometric constraint solver dialog:</p>
+
+
+<p align=center><img src="images/gcsDialog2.jpg"></p>
+<p class=imageLabel>[Geometric constraint solver dialog]</p>
+<br>
+
+<li><strong>Enable geometric constraint solver</strong>: enables or disables the geometric constraint solver.
+</li>
+
+<li><strong>Insert new object</strong>: if clicked, the mechanism that the selected <a href="objects.htm">object</a> is part of will be added to the list of mechanisms to solve. The mechanism names in the list can be edited. The properties below indicate the properties of the currently selected item in the list.<br>
+</li>
+
+<li><strong>Explicit handling</strong>: indicates whether the selected mechanism should be explicitly solved. If checked, geometric constraint solving for this mechanism will not be handled when sim.handleMechanism(sim.handle_all_except_explicit) is called, but only if sim.handleMechanism(sim.handle_all) or sim.handleMechanism(mechanismHandle) is called. This is useful if the user wishes to handle geometric constraint solving for that mechanism in a <a href="childScripts.htm">child script</a> rather than in the <a href="mainScript.htm">main script</a> (if not checked, geometric constraint solving for that mechanism will be handled twice, once when sim.handleMechanism(sim.handle_all_except_explicit) is called in the main script, and once when sim.handleMechanism(mechanismHandle) is called in the child script). Refer also to the section on <a href="explicitHandling.htm">explicit and non-explicit calls</a>.<br>
+</li>
+
+<li><strong>Maximum iterations</strong>: the maximum number of iterations that will be used to close the mechanism.<br>
+</li>
+
+<li><strong>Interpolation</strong>: each iteration step will take into account the interpolation factor. If it is 1.0, the iteration step will try to close the mechanism at once (which might cause large <a href="joints.htm">joint</a> variations, and reduce stability, depending on the mechanism). Smaller interpolation values will increase stability, but reduce resolution speed.<br>
+</li>
+
+<li><strong>General damping</strong>: damping is useful in situations where the mechanism is over-constrained or close to a singularity.<br>
+</li>
+
+<li><strong>Maximum linear / angular variation</strong>: the maximum joint variation tolerated at each iteration step.
+</li>
+
+<li><strong>Loop closure positional / angular tolerance</strong>: the tolerated errors. If all linked <a href="dummies.htm">dummies</a> are within that tolerance, the mechanism is considered as solved and no further iteration step is needed.<br>
+</li>
+
+
+
+<br>
+<h3 class=recommendedTopics>Recommended topics</h3>
+<li><a href="geometricConstraintSolverModule.htm">Geometric constraint solver</a></li>
+<li><a href="geometricConstraintSolverOperation.htm">Using the geometric constraint solver</a></li>
+<br>
+<br>
+ </tr>
+</table> 
+</div>  
+  
+  
+</body>
+
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Mill types and mode of operation</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>Mill types and mode of operation</h1>
+
+
+<p><a href="mills.htm">Mills</a> come in 4 different types and can be customized to a large extent: </p>
+
+<p align=center><img src="images/millsDescription1.jpg"></p>
+<p class=imageLabel>[Pyramid-type, cylinder-type, disk-type and cone-type mills]</p>
+<br>
+
+<p>Mills will always have a convex cutting volume, however they can be combined to generate a non-convex cutting volume or more complex volumes. They cut parts of <a href="cuttableObjects.htm">cuttable</a> <a href="entities.htm">entities</a> away that interferes with their cutting volume. By default, cuttable objects have their cuttable tag disabled. Refer to the <a href="commonPropertiesDialog.htm">object common properties</a> to enable or disable individual object's cuttable tag.<br>
+</p>
+
+<p>Parts of cuttable objects that have been cut away will not be <a href="collidableObjects.htm">collidable</a>, <a href="measurableObjects.htm">measurable</a>, <a href="detectableObjects.htm">detectable</a> or <a href="renderableObjects.htm">renderable</a> anymore (but the remainder will). Depending on the size and complexity of cuttable objects, the cutting operation can be slowed down. The cutting speed is also linked to the cutting volume precision and the rate at which the cut is performed. Smooth cutting volumes usually perform better when the cutting is continuous (not a one-time cut). A too small cutting rate might also result in a slow-down due to the increasing size of the required calculation structure. The best is to test for the best cutting volume - cutting rate relationship.<br>
+</p>
+
+<p>Cut objects can be reset to their initial state with the <a href="regularApi/simResetMilling.htm">sim.resetMilling</a> command. Changes can also be made permanent with the <a href="regularApi/simApplyMilling.htm">sim.applyMilling</a> command.<br>
+</p>
+
+<p>The amount of cut surface/volume can be recorded by graph objects. Refer to <a href="graphs.htm">graphs</a> and <a href="dataStreamTypes.htm">graph data stream types</a> for more information about how to record mill data.
+</p>
+
+
+<br>
+<h3 class=recommendedTopics>Recommended topics</h3>
+<li><a href="mills.htm">Mills</a></li>
+<li><a href="millPropertiesDialog.htm">Mill properties</a></li>
+<li><a href="cuttableObjects.htm">Cuttable objects</a></li>
+
+<br>
+<br>
+
+ </tr>
+</table> 
+</div>  
+  
+  
+</body>
+
+</html>

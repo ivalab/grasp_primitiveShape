@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>simSetVisionSensorImage</title>
+<link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../../index.html" TARGET="_top"><img src="../images/homeImg.png"></a></p>
+
+<h1><a href="../apiOverview.htm">Regular API</a> function</h1>
+<h3 class=subsectionBar><a name="simSetVisionSensorImage" id="simSetVisionSensorImage"></a>simSetVisionSensorImage / sim.setVisionSensorImage</h3>
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Sets the rgb-image of a vision sensor (and applies any image processing filter if specified in the vision sensor dialog). Make sure the vision sensor is flagged as <strong>external input</strong>. Use <a href="simGetVisionSensorResolution.htm">sim.getVisionSensorResolution</a> to know the size of the image buffer that you need to provide (buffer size=resolutionX *resolutionY*3). The &quot;regular&quot; use of this function is to first read the data from a vision sensor with <a href="simGetVisionSensorImage.htm">sim.getVisionSensorImage</a>, do some custom filtering, then write the modified image back. The alternate use of this function is to display textures, video images, etc. by using a vision sensor object (without however making use of the vision sensor functionality), since a vision sensor can be &quot;looked through&quot; like camera objects. See also <a href="simSetVisionSensorCharImage.htm">sim.setVisionSensorCharImage</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCSyn>
+C synopsis
+</td> 
+<td class=apiTableRightCSyn>simInt simSetVisionSensorImage(simInt sensorHandle,const simFloat* image)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCParam>C parameters</td> 
+<td class=apiTableRightCParam>
+<div><strong>sensorHandle</strong>: handle of the vision sensor object. Can be combined with <a href="../apiConstants.htm#specialHandleFlags">sim_handleflag_greyscale</a> (simply add sim_handleflag_greyscale to sensorHandle), if you wish to provide grey scale values instead of rgb values.</div>
+<div><strong>image</strong>: rgb buffer containing the image (buffer size must be resolutionX*resolutionY*3). Values in the buffer should vary between 0 and 1. In case a grey scale image is provided, the buffer size must be resolutionX*resolutionY.</div>
+<div></div></td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftCRet>
+C return value
+</td> 
+<td class=apiTableRightCRet>
+<div>-1 if operation was not successful. 0 if the applied filter didn't trigger anything, 1 if the appIied filter triggered a detection<br>
+</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLSyn>
+Lua synopsis
+</td> 
+<td class=apiTableRightLSyn> <div> (1) number result=sim.setVisionSensorImage(number sensorHandle,table image) </div>
+<div> (2) number result=sim.setVisionSensorImage(number sensorHandle,string image)</div></td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLParam>Lua parameters</td> 
+<td class=apiTableRightLParam>
+<div><strong>sensorHandle</strong>: handle of the vision sensor object. Can be combined with <a href="../apiConstants.htm#specialHandleFlags">sim.handleflag_greyscale</a> (simply add sim.handleflag_greyscale to sensorHandle), if you wish to provide grey scale values instead of rgb values.</div>
+<div>(1) a table containing individual values [0-1] for the red, green and blue components, or for the grey component.</div>
+<div>(2) a string containing individual chars [0-255] for the red, green and blue components, or for the grey component.</div></td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=apiTableLeftLRet>
+Lua return values
+</td> 
+<td class=apiTableRightLRet>
+<div>Same as C-function</div>
+<div></div></td> 
+</tr> 
+
+<tr class=apiTableTr> 
+<td class=remApiTableLeftCParam>
+Remote API equiv.
+</td> 
+<td class=remApiTableRightCParam>
+<div>B0-based remote API: <a href="../b0RemoteApi-cpp.htm#simxSetVisionSensorImage">simxSetVisionSensorImage</a></div>
+<div>Legacy remote API: <a href="../remoteApiFunctions.htm#simxSetVisionSensorImage">simxSetVisionSensorImage</a></div>
+</td> 
+</tr> 
+
+</table> 
+
+<br>
+<p><a href="../apiFunctions.htm">All regular API functions on one page</a></p>
+<br>
+<br>
+</td>
+</tr>
+</table>
+</div>
+</body>
+</html>

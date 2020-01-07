@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Using the geometric constraint solver</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>Using the geometric constraint solver</h1>
+
+<p>V-REP's <a href="geometricConstraintSolverModule.htm">geometric constraint solver functionality</a> operates in a similar way as the <a href="inverseKinematicsModule.htm">kinematics calculation module</a>, with the difference that the solver will try to automatically identify kinematic chains, and handle them in an appropriate way (automatic constraint adjustments, loop closures, etc.). Typically, the user has to tell the solver:<br>
+</p>
+
+<li>which <a href="objects.htm">objects</a> (<a href="dummies.htm">dummies</a>) should coincide (in order to close a loop for instance) </li>
+
+<li>what mechanism has to be handled by the geometric constraint solver
+</li>
+
+<li>which additional constraints should be applied to the mechanism
+</li>
+
+<p>
+Following section explains each of above items in details:
+</p>
+<br>
+
+
+<table class=subsectionTable><tr class=subsectionTd><td class=subsectionTd>
+<a name="closureConstraints"></a>Specifying closure constraints
+</td></tr></table> 
+
+<p>Closure constraints can be seen as constraints that require two object's configurations (position and orientation) to be identical. The idea is illustrated in following figures (representation is limited to 2 dimensions for clarity's sake):<br>
+</p>
+
+<p align=center><img src="images/gcsOp1.jpg"></p>
+<p class=imageLabel>[The geometric constraint solver closure constraint]</p>
+<br>
+
+<p align=center><img src="images/gcsOp2.jpg"></p>
+<p class=imageLabel>[Closing action of the geometric constraint solver (1) intermediate situation, (2) final situation]</p>
+<br>
+
+<p>The geometric constraint solver will try to overlap the position and orientation of the two objects WHILE trying to keep the mechanism coherent (i.e. by only adjusting the <a href="joints.htm">joints</a> in <strong>IK mode</strong> in the mechanism to reach that overlap situation). The objects that the geometric constraint solver uses to specify closure constraints are <a href="dummies.htm">dummies</a>. To this end, two dummies need to be marked as <strong>closure pair</strong>. This can be adjusted in the <a href="dummyPropertiesDialog.htm">dummy properties</a> by selecting the opposite dummy as <strong>Linked dummy</strong> and specifying <strong>GCS, overlap constraint</strong> for the Link type. Following figure illustrates two linked dummies specifying a geometric constraint solver closure constraint:<br>
+</p>
+
+
+<p align=center><img src="images/gcsOp3.jpg"></p>
+<p class=imageLabel>[Two linked dummies specifying a closure constraint]</p>
+<br>
+
+
+<table class=subsectionTable><tr class=subsectionTd><td class=subsectionTd>
+<a name="mechanismSpecification"></a>Specifying the mechanism to be solved
+</td></tr></table> 
+
+<p>Next, the geometric constraint solver needs to be informed which mechanism it has to handle. Is considered one and same mechanism all objects that can be reached from a given object, by following a path that can go:<br>
+</p>
+
+<li>from one object to its parent object.
+</li>
+
+<li>from one object to its child objects.
+</li>
+
+<li>from one dummy to its linked dummy (however only links of type <strong>GCS, overlap constraint</strong>) </li>
+
+<p>Two object trees that don't share any common parent objects (referred hereafter as elements), can also be part of the same mechanism if two linked dummies join them. This is illustrated in following figure:<br>
+</p>
+
+<p align=center><img src="images/gcsOp4.jpg"></p>
+<p class=imageLabel>[One mechanism composed by 3 elements (object trees)]</p>
+<br>
+
+<p>The last parent object of the object that is chosen as the starting point of the mechanism exploration (path exploration) is referred to as the <em>base object of the mechanism</em>. When the geometric constraint solver tries to solve a mechanism, it will try to do so by keeping the base object of the mechanism in place. This is important to remember. To specify a mechanism to be solved, select an object parented with the base object of the mechanism and in the geometric constraint solver dialog click <strong>insert new object</strong>. One same mechanism can only be registered once for solving. Mechanisms that do not include at least one  joint in <strong>IK mode</strong> will not be handled by the solver. </p>
+<br>
+
+
+<table class=subsectionTable><tr class=subsectionTd><td class=subsectionTd>
+<a name="AdditionalConstraints"></a>Specifying additional constraints
+</td></tr></table> 
+
+<p>Additional positional constraints can be specified for a mechanism. This can be done with two linked dummies that form a tip-target pair (specify <strong>GCS, tip</strong>/<strong>GCS, target</strong> as <em>Link type</em> in the <a href="dummyPropertiesDialog.htm">dummy properties</a>). Following figures illustrate two linked dummies, where one is marked as target (representation is limited to 2 dimensions for clarity's sake):<br>
+</p>
+
+
+<p align=center><img src="images/gcsOp5.jpg"></p>
+<p class=imageLabel>[The geometric constraint solver position constraint]</p>
+<br>
+
+<p align=center><img src="images/gcsOp6.jpg"></p>
+<p class=imageLabel>[Position constraint action of the geometric constraint solver (1) intermediate situation, (2) final situation]</p>
+<br>
+
+<p>The dummy marked as target is not considered as part of the mechanism and therefore will not move during geometric constraint resolution, while the other dummy will try to reach the same position as the dummy marked as target. An analogy can be made with the <em>tip-target</em> dummy pair in the kinematics calculation module. Following figure illustrates two linked dummies, where one is marked as target:<br>
+</p>
+
+
+<p align=center><img src="images/gcsOp7.jpg"></p>
+<p class=imageLabel>[Two linked dummies where one is marked as target]</p>
+<br>
+
+<table class=subsectionTable><tr class=subsectionTd><td class=subsectionTd>
+<a name="solverOperation"></a>Geometric constraint solver operation
+</td></tr></table> 
+
+<p>When building a mechanism that will be solved by the geometric constraint solver, make sure that the mechanism is coherent and that constraints are not <em>impossible</em> (i.e. that there are enough degrees of freedom for the mechanism to <em>work</em>).<br>
+</p>
+
+<p>Following figures show an example of a mechanism and its resolution:<br>
+</p>
+
+
+<p align=center><img src="images/gcsOp8.jpg"></p>
+<p class=imageLabel>[(1) Mechanism containing 3 elements before and (2) during simulation]</p>
+<br>
+
+<p align=center><img src="images/gcsOp9.jpg"></p>
+<p class=imageLabel>[Same mechanism, but different base object (1) before and (2) during simulation]</p>
+<br>
+
+<p align=center><img src="images/gcsOp10.jpg"></p>
+<p class=imageLabel>[(1) Mechanism containing 2 elements before and (2) during simulation]</p>
+<br>
+
+<p>During simulation, a mechanism that was previously registered to be solved with the geometric constraint solver can be manipulated in a flexible way with the mouse, when the mechanism navigation mode is selected. That mode can be enabled via following API call: <a href="regularApi/simSetNavigationMode.htm">sim.setNavigationMode</a>(sim.navigation_ikmanip)
+</p>
+
+<p>Simply click and drag any <a href="shapes.htm">shape object</a> that is part of the mechanism, and the solver will try to take into account that additional position constraint. Following figure illustrates such a drag operation:<br>
+</p>
+
+<p align=center><img src="images/gcsOp12.jpg"></p>
+<p class=imageLabel>[Mechanism with two additional position constraints]</p>
+<br>
+
+<p>It is good practice to build your mechanism as a tree structure (i.e. where all objects in the mechanism have at least one common parent object) and have linked dummies be in charge of closing certain tree branches. By doing so you reduce the mechanism's complexity, you simplify the mechanism's <a href="userInterface.htm#SceneHierarchy">scene hierarchy</a> representation, and you will be able to handle the mechanism as a <a href="models.htm">model</a>. <br>
+</p>
+
+<p>The geometric constraint solver functionality is very appropriate for simple mechanisms too, where direct and flexible interaction with the user is sought. Following figures give some such examples:<br>
+</p>
+
+
+<p align=center><img src="images/gcsOp13.jpg"></p>
+<p class=imageLabel>[Mechanism manipulation drag operation for simple mechanisms]</p>
+
+
+
+
+<br>
+<h3 class=recommendedTopics>Recommended topics</h3>
+<li><a href="geometricConstraintSolverModule.htm">Geometric constraint solver</a></li>
+<li><a href="geometricConstraintSolverDialog.htm">Geometric constraint solver dialog</a></li>
+<br>
+<br>
+ </tr>
+</table> 
+</div>  
+  
+  
+</body>
+
+</html>

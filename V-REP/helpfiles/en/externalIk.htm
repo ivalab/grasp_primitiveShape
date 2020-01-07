@@ -1,0 +1,2204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>External kinematics</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>External kinematics (<a href="auxiliaryApiOverview.htm">auxiliary API</a>)</h1>
+
+<p>This collection of functions allows to perform the same kinematic calculations as you are able to do from within V-REP. Exception to this is the obstacle avoidance functionality which is only supported from within V-REP.</p>
+
+<p>The idea is to normally build your kinematic tasks inside V-REP, then to export the kinematic content of a scene, which can then directly be used with the embeddable functions below. The required source code is located <a href="https://github.com/CoppeliaRobotics/externalIk" target="_blank">here</a>. Make sure to include all files into your project, and include <em>extIk.h</em> in the files where you need access to the functions. Make also sure you know how to use the kinematics functionality from within V-REP first! If you have access to the <a href="apiOverview.htm">regular API</a>, then you won't need this auxiliary API, since all following functions have their <a href="apiFunctionListCategory.htm#generalIkFunctionality">regular API equivalent</a>.</p>
+
+<p>The external IK source code is not directly part of V-REP, and carries separate licensing conditions. Refer to the source code header sections for details.</p>
+
+<p>Follow the method below to perform kinematic calculations from within your own external application:</p>
+<li>Build your kinematic tasks within V-REP. Test them.</li>
+<li>Export the kinematic content of the scene with  [Menu bar --&gt; File --&gt; Export --&gt;  IK content...]</li>
+<li>Include the <a href="https://github.com/CoppeliaRobotics/externalIk" target="_blank">external kinematics code</a> in your own application.</li>
+<li>Call <a href="#simEmbLaunch">simEmbLaunch</a> at application start-up, and <a href="#simEmbShutDown">simEmbShutDown</a> at application end.</li>
+<li>Call <a href="#simEmbStart">simEmbStart</a> to import the previously exported file. simEmbStart may be called as often as desired to reset the kinematic scene. A kinematic scene is similar to a scene in V-REP, except that it is stripped of everything non-kinematic.</li>
+<li>Call various functions to shift / rotate the target dummies (e.g. with <a href="#simEmbSetObjectTransformation">simEmbSetObjectTransformation</a>), or to move non-active joints, i.e. joints that are not in IK mode (e.g. with <a href="#simEmbSetJointPosition">simEmbSetJointPosition</a>).</li>
+<li>Call <a href="#simEmbHandleIkGroup">simEmbHandleIkGroup</a> to perform one calculation pass (i.e. effectively bringing dummy tips onto their targets). In case you are searching for a specific robot configuration, or need to instantaneously jump to a new end-effector pose, then call <a href="#simEmbGetConfigForTipPose">simEmbGetConfigForTipPose</a>.</li>
+<li>Repeat above last 2 steps as often as required. Make sure to check for return values to detect errors.</li>
+<li>If you have several instances of a same robot, then you can call <a href="#simEmbLaunch">simEmbLaunch</a> several times to initialize several instances of the embedded kinematics. You can then switch from one instance to another with <a href="#simEmbSwitch">simEmbSwitch</a>.</li>
+
+<p>Refer also to the following examples: <a href="https://github.com/CoppeliaRobotics/externalIkDemo1" target="_blank">externalIkDemo1</a>, <a href="https://github.com/CoppeliaRobotics/externalIkDemo2" target="_blank">externalIkDemo2</a>, <a href="https://github.com/CoppeliaRobotics/externalIkDemo3" target="_blank">externalIkDemo3</a>. Those demo applications use the external kinematics routines described here, combined with the <a href="remoteApiOverview.htm">remote API</a> functionality to control two different robots in inverse/forward kinematics mode. The demo scenes <em>externalIkDemo1.ttt</em>, <em>externalIkDemo2</em>.ttt and <em>externalIkDemo3.ttt</em> launch the <em>externalIkDemo1</em>, <em>externalIkDemo2</em> and respectively <em>externalIkDemo3</em> applications automatically.</p>
+
+<pre class=lightGreyBox>
+<a href="#simEmbEulerAnglesToQuaternion">simEmbEulerAnglesToQuaternion</a>
+<a href="#simEmbGetConfigForTipPose">simEmbGetConfigForTipPose</a>
+<a href="#simEmbGetIkGroupHandle">simEmbGetIkGroupHandle</a>
+<a href="#simEmbGetJointInterval">simEmbGetJointInterval</a>
+<a href="#simEmbGetJointPosition">simEmbGetJointPosition</a>
+<a href="#simEmbGetJointTransformation">simEmbGetJointTransformation</a>
+<a href="#simEmbGetJointMatrix">simEmbGetJointMatrix</a>
+<a href="#simEmbGetObjectHandle">simEmbGetObjectHandle</a>
+<a href="#simEmbGetObjectParent">simEmbGetObjectParent</a>
+<a href="#simEmbGetObjectTransformation">simEmbGetObjectTransformation</a>
+<a href="#simEmbGetObjectMatrix">simEmbGetObjectMatrix</a>
+<a href="#simEmbGetRotationAxis">simEmbGetRotationAxis</a>
+<a href="#simEmbGetRotationAxis_matrix">simEmbGetRotationAxis_matrix</a>
+<a href="#simEmbHandleIkGroup">simEmbHandleIkGroup</a>
+<a href="#simEmbInterpolateTransformations">simEmbInterpolateTransformations</a>
+<a href="#simEmbInterpolateMatrices">simEmbInterpolateMatrices</a>
+<a href="#simEmbInvertTransformation">simEmbInvertTransformation</a>
+<a href="#simEmbInvertMatrix">simEmbInvertMatrix</a>
+<a href="#simEmbLaunch">simEmbLaunch</a>
+<a href="#simEmbMatrixToTransformation">simEmbMatrixToTransformation</a>
+<a href="#simEmbMultiplyTransformations">simEmbMultiplyTransformations</a>
+<a href="#simEmbMultiplyMatrices">simEmbMultiplyMatrices</a>
+<a href="#simEmbMultTransformationWithVector">simEmbMultTransformationWithVector</a>
+<a href="#simEmbMultMatrixWithVector">simEmbMultMatrixWithVector</a>
+<a href="#simEmbQuaternionToEulerAngles">simEmbQuaternionToEulerAngles</a>
+<a href="#simEmbRotateAroundAxis">simEmbRotateAroundAxis</a>
+<a href="#simEmbRotateAroundAxis_matrix">simEmbRotateAroundAxis_matrix</a>
+<a href="#simEmbSetIkElementProperties">simEmbSetIkElementProperties</a>
+<a href="#simEmbSetIkGroupExplicitHandling">simEmbSetIkGroupExplicitHandling</a>
+<a href="#simEmbSetIkGroupProperties">simEmbSetIkGroupProperties</a>
+<a href="#simEmbSetJointInterval">simEmbSetJointInterval</a>
+<a href="#simEmbSetJointMode">simEmbSetJointMode</a>
+<a href="#simEmbSetJointPosition">simEmbSetJointPosition</a>
+<a href="#simEmbSetObjectParent">simEmbSetObjectParent</a>
+<a href="#simEmbSetObjectTransformation">simEmbSetObjectTransformation</a>
+<a href="#simEmbSetObjectMatrix">simEmbSetObjectMatrix</a>
+<a href="#simEmbSetSphericalJointQuaternion">simEmbSetSphericalJointQuaternion</a>
+<a href="#simEmbSetSphericalJointMatrix">simEmbSetSphericalJointMatrix</a>
+<a href="#simEmbShutDown">simEmbShutDown</a>
+<a href="#simEmbStart">simEmbStart</a>
+<a href="#simEmbSwitch">simEmbSwitch</a>
+<a href="#simEmbTransformationToMatrix">simEmbTransformationToMatrix</a>
+</pre>
+
+<br>
+<br>
+<br>
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbEulerAnglesToQuaternion" id="simEmbEulerAnglesToQuaternion"></a>simEmbEulerAnglesToQuaternion (regular API equivalent: <a href="regularApi/simGetEulerAnglesFromMatrix.htm">sim.getEulerAnglesFromMatrix</a>)
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves a quaternion based on <a href="eulerAngles.htm">Euler angles</a>. See also <a href="#simEmbQuaternionToEulerAngles">simEmbQuaternionToEulerAngles</a> and <a href="#simEmbTransformationToMatrix">simEmbTransformationToMatrix</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbEulerAnglesToQuaternion(const real* euler,real* quaternion)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>euler (input)</strong>: the 3 Euler angles (alpha, beta, gamma)</div>
+<div><strong>quaternion (output)</strong>: the 4 values of a quaternion (x, y, z, w)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbGetConfigForTipPose" id="simEmbGetConfigForTipPose"></a>simEmbGetConfigForTipPose (regular API equivalent: <a href="regularApi/simGetConfigForTipPose.htm">sim.getConfigForTipPose</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Searches for a manipulator configuration that matches a given end-effector position/orientation in space. Search is randomized.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbGetConfigForTipPose(int ikGroupHandle,int jointCnt,const int* jointHandles,real thresholdDist,int maxIterations,real* retConfig,const real* metric,const int* jointOptions,void* reserved)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>ikGroupHandle (input)</strong>: the handle of an IK group that is in charge of bringing the manipulator's tip onto a target. The IK group can also be marked as <em>explicit handling</em> if needed</div>
+<div><strong>jointCnt (input)</strong>: the number of joint handles provided in the <em>jointHandles</em> array</div>
+<div><strong>jointHandles (input)</strong>: an array with <em>jointCnt</em> entries, that specifies the joint handles for the joints we wish to retrieve the values calculated by the IK</div>
+<div><strong>thresholdDist (input)</strong>: a distance indicating when IK should be computed in order to try to bring the tip onto the target: since the search algorithm proceeds by generating random configurations, many of them produce a tip pose that is too far from the target pose to run IK successfully. Choosing a large value will result in slow calculations, choosing a small value might produce a smaller subset of solutions. Distance between two poses is calculated using a <em>metric</em></div>
+<div><strong>maxIterations (input)</strong>: the maximum number of calculation iterations before the function returns</div>
+<div><strong>retConfig (output)</strong>: an array with <em>jointCnt</em> entries, that will receive the IK calculated joint values, as specified by the <em>jointHandles</em> array</div>
+<div><strong>metric (input)</strong>: an array to 4 values indicating a metric used to compute pose-pose distances: distance=sqrt((dx*metric[0])^2+(dy*metric[1])^2+(dz*metric[2])^2+(angle*metric[3])^2). Can be NULL for a default metric of {1.0,1.0,1.0,0.1}</div>
+<div><strong>jointOptions (input)</strong>: a bit-coded value corresponding to each specified joint handle. Bit 0 (i.e. 1) indicates the corresponding joint is dependent of another joint. Can be NULL.</div>
+<div><strong>reserved (input/output)</strong>: reserved for future extensions. Set to NULL</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 in case of an error, 0 if no result was found, otherwise 1.</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbGetIkGroupHandle" id="simEmbGetIkGroupHandle"></a>simEmbGetIkGroupHandle (regular API equivalent: <a href="regularApi/simGetIkGroupHandle.htm">sim.getIkGroupHandle</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves the handle of an IK group based on its name. Specify the full IK group name, including suffixes.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbGetIkGroupHandle(const char* ikGroupName)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>ikGroupName (input)</strong>: the name of the IK group</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed, otherwise the handle of the IK group.</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbGetJointInterval" id="simEmbGetJointInterval"></a>simEmbGetJointInterval (regular API equivalent: <a href="regularApi/simGetJointInterval.htm">sim.getJointInterval</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves the limits of a joint. See also <a href="#simEmbSetJointInterval">simEmbSetJointInterval</a></td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbGetJointInterval(int jointHandle,real* interval)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>jointHandle (input)</strong>: handle of the joint</div>
+<div><strong>interval (output)</strong>: pointer to 2 values: the low limit, and the range (i.e. highLimit = lowLimit + range). If the joint is cyclic, then the interval has no meaning.</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed, 0 if the limits are valid, or 1 if the joint is cyclic.</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbGetJointPosition" id="simEmbGetJointPosition"></a>simEmbGetJointPosition (regular API equivalent: <a href="regularApi/simGetJointPosition.htm">sim.getJointPosition</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves the intrinsic position of a joint. This function cannot be used with spherical joints (use <a href="#simEmbGetJointTransformation">simEmbGetJointTransformation</a> instead). See also <a href="#simEmbSetJointPosition">simEmbSetJointPosition</a></td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbGetJointPosition(int jointHandle,real* position)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>jointHandle (input)</strong>: handle of the joint</div>
+<div><strong>position (output)</strong>: intrinsic position of the joint. This is a one-dimensional value: if the   joint is revolute, the rotation angle is returned, if the joint is   prismatic, the translation amount is returned, etc.</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbGetJointMatrix" id="simEmbGetJointMatrix"></a>simEmbGetJointMatrix (regular API equivalent: <a href="regularApi/simGetJointMatrix.htm">sim.getJointMatrix</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves the intrinsic matrix of a joint (the transformation matrix caused by the joint movement). See also <a href="#simEmbSetSphericalJointMatrix">simEmbSetSphericalJointMatrix</a> and <a href="#simEmbGetJointTransformation">simEmbGetJointTransformation</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbGetJointMatrix(int jointHandle,real* matrix)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>jointHandle (input)</strong>: handle of the joint</div>
+<div><strong>matrix (output)</strong>: the matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbGetJointTransformation" id="simEmbGetJointTransformation"></a>simEmbGetJointTransformation (regular API equivalent: <a href="regularApi/simGetJointMatrix.htm">sim.getJointMatrix</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves the intrinsic transformation of a joint (the transformation caused by the joint movement). See also <a href="#simEmbSetSphericalJointQuaternion">simEmbSetSphericalJointQuaternion</a> and <a href="#simEmbGetJointMatrix">simEmbGetJointMatrix</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbGetJointTransformation(int jointHandle,real* position,real* quaternion)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>jointHandle (input)</strong>: handle of the joint</div>
+<div><strong>position (output)</strong>: the position component of the transformation (x, y, z)</div>
+<div><strong>quaternion (output)</strong>: the orientation component of the transformation (x, y, z, w)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbGetObjectHandle" id="simEmbGetObjectHandle"></a>simEmbGetObjectHandle (regular API equivalent: <a href="regularApi/simGetObjectHandle.htm">sim.getObjectHandle</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves an object handle based on its name. Specify the full object name, including suffixes.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbGetObjectHandle(const char* objectName)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>objectName (input)</strong>: name of the object</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed, otherwise the handle of the object</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbGetObjectParent" id="simEmbGetObjectParent"></a>simEmbGetObjectParent (regular API equivalent: <a href="regularApi/simGetObjectParent.htm">sim.getObjectParent</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves the handle of an object's parent object. See also <a href="#simEmbSetObjectParent">simEmbSetObjectParent</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbGetObjectParent(int objectHandle)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>objectHandle (input)</strong>: handle of the object</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed, otherwise the handle of the parent object</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbGetObjectMatrix" id="simEmbGetObjectMatrix"></a>simEmbGetObjectMatrix (regular API equivalent: <a href="regularApi/simGetObjectMatrix.htm">sim.getObjectMatrix</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves the matrix of an object. See also <a href="#simEmbSetObjectMatrix">simEmbSetObjectMatrix</a> and <a href="#simEmbGetObjectTransformation">simEmbGetObjectTransformation</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbGetObjectMatrix(int objectHandle,int relativeToObjectHandle,real* matrix)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>objectHandle (input)</strong>: handle of the object</div>
+<div><strong>relativeToObjectHandle (input)</strong>: indicates relative to which reference frame we want the transformation. Specify   -1 to retrieve the absolute transformation, sim_handle_parent to   retrieve the transformation relative to the object's parent, or   an object handle relative to whose reference frame we want the   transformation.</div>
+<div><strong>matrix (output)</strong>: the matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbGetObjectTransformation" id="simEmbGetObjectTransformation"></a>simEmbGetObjectTransformation (regular API equivalent: <a href="regularApi/simGetObjectMatrix.htm">sim.getObjectMatrix</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves the transformation (position / orientation) of an object. See also <a href="#simEmbSetObjectTransformation">simEmbSetObjectTransformation</a> and <a href="#simEmbGetObjectMatrix">simEmbGetObjectMatrix</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbGetObjectTransformation(int objectHandle,int relativeToObjectHandle,real* position,real* quaternion)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>objectHandle (input)</strong>: handle of the object</div>
+<div><strong>relativeToObjectHandle (input)</strong>: indicates relative to which reference frame we want the transformation. Specify   -1 to retrieve the absolute transformation, sim_handle_parent to   retrieve the transformation relative to the object's parent, or   an object handle relative to whose reference frame we want the   transformation.</div>
+<div><strong>position (output)</strong>: the position component of the transformation (x, y, z)</div>
+<div><strong>quaternion (output)</strong>: the orientation component of the transformation (x, y, z, w)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbGetRotationAxis_matrix" id="simEmbGetRotationAxis_matrix"></a>simEmbGetRotationAxis_matrix (regular API equivalent: <a href="regularApi/simGetRotationAxis.htm">sim.getRotationAxis</a>)
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves an axis and rotation angle that brings one matrix onto another one. The translation part of the matrix is ignored. This function, when used in combination with <a href="#simEmbRotateAroundAxis_matrix">simEmbRotateAroundAxis_matrix</a>, can be used to build interpolations between matrices. See also <a href="#simEmbGetRotationAxis">simEmbGetRotationAxis</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbGetRotationAxis_matrix(const real* matrixStart,const real* matrixGoal,real* axis,real* angle)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>matrixStart (input)</strong>: the first matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+<div><strong>matrixGoal (input)</strong>: the second matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+<div><strong>axis (output)</strong>: the rotation axis (x, y, z vector)</div>
+<div><strong>angle (output)</strong>: the rotation angle</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbGetRotationAxis" id="simEmbGetRotationAxis"></a>simEmbGetRotationAxis (regular API equivalent: <a href="regularApi/simGetRotationAxis.htm">sim.getRotationAxis</a>)
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves an axis and rotation angle that brings one transformation onto another one. The translation part of the transformations is ignored. This function, when used in combination with <a href="#simEmbRotateAroundAxis">simEmbRotateAroundAxis</a>, can be used to build interpolations between transformations. See also <a href="#simEmbGetRotationAxis_matrix">simEmbGetRotationAxis_matrix</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbGetRotationAxis(const real* positionStart,const real* quaternionStart,const real* positionGoal,const real* quaternionGoal,real* axis,real* angle)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>positionStart (input)</strong>: the position component of the first transformation (x, y, z)</div>
+<div><strong>quaternionStart (input)</strong>: the orientation component of the first transformation (x, y, z, w)</div>
+<div><strong>positionGoal (input)</strong>: the position component of the second transformation (x, y, z)</div>
+<div><strong>quaternionGoal (input)</strong>:  the orientation component of the second transformation (x, y, z, w)</div>
+<div><strong>axis (output)</strong>: the rotation axis (x, y, z vector)</div>
+<div><strong>angle (output)</strong>: the rotation angle</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbHandleIkGroup" id="simEmbHandleIkGroup"></a>simEmbHandleIkGroup (regular API equivalent: <a href="regularApi/simHandleIkGroup.htm">sim.handleIkGroup</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Handles (i.e. solves) an IK group (i.e. by trying to respect the given constraints).</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbHandleIkGroup(int ikGroupHandle)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>ikGroupHandle (input)</strong>: handle of the IK group or sim_handle_all or   sim_handle_all_except_explicit. (sim_handle_all will handle all IK   groups, while sim_handle_all_except_explicit will only handle those that   are not marked as "explicit handling")</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>number of performed calculations (i.e. when IK group calculation results are   different from sim_ikresult_not_performed) if no specific IK group was   specified, or a value of type <a href="apiConstants.htm#ikCalculationResults">IK result</a> if a specific IK group was specified, -1 in case of an error (a failed IK group calculation is not considered as an error)</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbInterpolateMatrices" id="simEmbInterpolateMatrices"></a>simEmbInterpolateMatrices (regular API equivalent: <a href="regularApi/simInterpolateMatrices.htm">sim.interpolateMatrices</a>)
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Computes the interpolated matrix between 2 matrices. See also <a href="#simEmbInterpolateTransformations">simEmbInterpolateTransformations</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbInterpolateMatrices(const real* matrix1,const real* matrix2,real interpolFactor,real* matrixOut)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>matrix1 (input)</strong>: the first matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+<div><strong>matrix2 (input)</strong>: the second matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+<div><strong>interpolFactor (input)</strong>: the interpolation factor, a value between 0.0 and 1.0 (0.0--&gt; transformationOut=transformationIn1, 1.0--&gt; transformationOut=transformationIn2)</div>
+<div><strong>matrixOut (output)</strong>: the interpolated matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbInterpolateTransformations" id="simEmbInterpolateTransformations"></a>simEmbInterpolateTransformations (regular API equivalent: <a href="regularApi/simInterpolateMatrices.htm">sim.interpolateMatrices</a>)
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Computes the interpolated transformation between 2 transformations. See also <a href="#simEmbInterpolateMatrices">simEmbInterpolateMatrices</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbInterpolateTransformations(const real* position1,const real* quaternion1,const real* position2,const real* quaternion2,real interpolFactor,real* positionOut,real* quaternionOut)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>position1 (input)</strong>: the position component of the first transformation (x, y, z)</div>
+<div><strong>quaternion1 (input)</strong>: the orientation component of the first transformation (x, y, z, w)</div>
+<div><strong>position2 (input)</strong>: the position component of the second transformation (x, y, z)</div>
+<div><strong>quaternion2 (input)</strong>: the orientation component of the second transformation (x, y, z, w)</div>
+<div><strong>interpolFactor (input)</strong>: the interpolation factor, a value between 0.0 and 1.0 (0.0--&gt; transformationOut=transformationIn1, 1.0--&gt; transformationOut=transformationIn2)</div>
+<div><strong>positionOut (output)</strong>: the position component of the interpolated transformation (x, y, z)</div>
+<div><strong>quaternionOut (output)</strong>: the orientation component of the interpolated transformation (x, y, z, w)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbInvertMatrix" id="simEmbInvertMatrix"></a>simEmbInvertMatrix (regular API equivalent: <a href="regularApi/simInvertMatrix.htm">sim.invertMatrix</a>)
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Inverts a transformation matrix. See also <a href="#simEmbInvertTransformation">simEmbInvertTransformation</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbInvertMatrix(real* matrix)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>matrix (input/output)</strong>: the matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbInvertTransformation" id="simEmbInvertTransformation"></a>simEmbInvertTransformation (regular API equivalent: <a href="regularApi/simInvertMatrix.htm">sim.invertMatrix</a>)
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Inverts a transformation. See also <a href="#simEmbInvertMatrix">simEmbInvertMatrix</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbInvertTransformation(real* position,real* quaternion)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>position (input/output)</strong>: the position component of the transformation (x, y, z)</div>
+<div><strong>quaternion (input/output)</strong>: the orientation component of the transformation (x, y, z, w)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbLaunch" id="simEmbLaunch"></a>simEmbLaunch
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Initializes a new instance of the external kinematics routines. Should be the very first function called. See also <a href="#simEmbShutDown">simEmbShutDown</a> and <a href="#simEmbSwitch">simEmbSwitch</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbLaunch()</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div>none</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>A value &lt;1 if operation failed, otherwise the handle of the created instance. Several instances can be created, but only one instance will be active at a given time. You can switch from one to another instance with <a href="#simEmbSwitch">simEmbSwitch</a>.</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbMatrixToTransformation" id="simEmbMatrixToTransformation"></a>simEmbMatrixToTransformation
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves a position and a quaternion from a matrix. See also <a href="#simEmbTransformationToMatrix">simEmbTransformationToMatrix</a> and <a href="#simEmbQuaternionToEulerAngles">simEmbQuaternionToEulerAngles</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbMatrixToTransformation(const real* matrix,real* position,real* quaternion)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>matrix (input)</strong>: the matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted)</div>
+<div><strong>position (output)</strong>: the 3 values of a position (x, y, z)</div>
+<div><strong>quaternion (output)</strong>: the 4 values of a quaternion (x, y, z, w)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbMultiplyMatrices" id="simEmbMultiplyMatrices"></a>simEmbMultiplyMatrices (regular API equivalent: <a href="regularApi/simMultiplyMatrices.htm">sim.multiplyMatrices</a>)
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Multiplies two matrices. See also <a href="#simEmbMultiplyTransformations">simEmbMultiplyTransformations</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbMultiplyMatrices(const real* matrix1,const real* matrix2,real* matrixOut)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>matrix1 (input)</strong>: the first matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+<div><strong>matrix2 (input)</strong>: the second matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+<div><strong>matrixOut (output)</strong>: the resulting matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbMultiplyTransformations" id="simEmbMultiplyTransformations"></a>simEmbMultiplyTransformations (regular API equivalent: <a href="regularApi/simMultiplyMatrices.htm">sim.multiplyMatrices</a>)
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Multiplies two transformation. See also <a href="#simEmbMultiplyMatrices">simEmbMultiplyMatrices</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbMultiplyTransformations(const real* position1,const real* quaternion1,const real* position2,const real* quaternion2,real* positionOut,real* quaternionOut)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>position1 (input)</strong>: the position component of the first transformation (x, y, z)</div>
+<div><strong>quaternion1 (input)</strong>: the orientation component of the first transformation (x, y, z, w)</div>
+<div><strong>position2 (input)</strong>: the position component of the second transformation (x, y, z)</div>
+<div><strong>quaternion2 (input)</strong>: the orientation component of the second transformation (x, y, z, w)</div>
+<div><strong>positionOut (output)</strong>: the position component of the multiplication (x, y, z)</div>
+<div><strong>quaternionOut (output)</strong>: the orientation component of the multiplication (x, y, z, w)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbMultMatrixWithVector" id="simEmbMultMatrixWithVector"></a>simEmbMultMatrixWithVector (regular API equivalent: <a href="regularApi/simTransformVector.htm">sim.transformVector</a>)
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Multiplies a vector with a matrix (v=m*v). See also <a href="#simEmbMultTransformationWithVector">simEmbMultTransformationWithVector</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbMultMatrixWithVector(const real* matrix,real* vect)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>matrix (input)</strong>: the matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+<div><strong>vect (input/output)</strong>: the vector to transform (x, y, z)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbMultTransformationWithVector" id="simEmbMultTransformationWithVector"></a>simEmbMultTransformationWithVector (regular API equivalent: <a href="regularApi/simTransformVector.htm">sim.transformVector</a>)
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Multiplies a vector with a transformation (v=tr*v). See also <a href="#simEmbMultMatrixWithVector">simEmbMultMatrixWithVector</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbMultTransformationWithVector(const real* position,const real* quaternion,real* vect)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>position (input)</strong>: the position component of the transformation (x, y, z)</div>
+<div><strong>quaternion (input)</strong>: the orientation component of the transformation (x, y, z, w)</div>
+<div><strong>vect (input/output)</strong>: the vector to transform (x, y, z)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbQuaternionToEulerAngles" id="simEmbQuaternionToEulerAngles"></a>simEmbQuaternionToEulerAngles (regular API equivalent: <a href="regularApi/simGetQuaternionFromMatrix.htm">sim.getQuaternionFromMatrix</a>)
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves <a href="eulerAngles.htm">Euler angles</a> based on a quaternion. See also <a href="#simEmbEulerAnglesToQuaternion">simEmbEulerAnglesToQuaternion</a> and <a href="#simEmbMatrixToTransformation">simEmbMatrixToTransformation</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbQuaternionToEulerAngles(const real* quaternion,real* euler)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>quaternion (input)</strong>: the 4 values of a quaternion (x, y, z, w)</div>
+<div><strong>euler (output)</strong>: the 3 Euler angles (alpha, beta, gamma)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbRotateAroundAxis_matrix" id="simEmbRotateAroundAxis_matrix"></a>simEmbRotateAroundAxis_matrix (regular API equivalent: <a href="regularApi/simRotateAroundAxis.htm">sim.rotateAroundAxis</a>)
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Rotates a matrix around a specific axis in space. This function, when used in combination with <a href="#simEmbGetRotationAxis_matrix">simEmbGetRotationAxis_matrix</a>, can be used to build interpolations between matrices. See also <a href="#simEmbRotateAroundAxis">simEmbRotateAroundAxis</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbRotateAroundAxis_matrix(const real* matrixIn,const real* axisVector,const real* axisPosition,real angle,real* matrixOut)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>matrixIn (input)</strong>: the input matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+<div><strong>axisVector (input)</strong>: the axis vector (x, y, z)</div>
+<div><strong>axisPosition (input)</strong>: the axis position (x, y, z)</div>
+<div><strong>angle (input)</strong>: the desired rotation angle</div>
+<div><strong>matrixOut (output)</strong>: the output matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbRotateAroundAxis" id="simEmbRotateAroundAxis"></a>simEmbRotateAroundAxis (regular API equivalent: <a href="regularApi/simRotateAroundAxis.htm">sim.rotateAroundAxis</a>)
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Rotates a transformation around a specific axis in space. This function, when used in combination with <a href="#simEmbGetRotationAxis">simEmbGetRotationAxis</a>, can be used to build interpolations between transformations. See also <a href="#simEmbRotateAroundAxis_matrix">simEmbRotateAroundAxis_matrix</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbRotateAroundAxis(const real* positionIn,const real* quaternionIn,const real* axisVector,const real* axisPosition,real angle,real* positionOut,real* quaternionOut)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>positionIn (input)</strong>: the position component of a transformation (x, y, z)</div>
+<div><strong>quaternionIn (input)</strong>: the orientation component of a transformation (x, y, z, w)</div>
+<div><strong>axisVector (input)</strong>: the axis vector (x, y, z)</div>
+<div><strong>axisPosition (input)</strong>: the axis position (x, y, z)</div>
+<div><strong>angle (input)</strong>: the desired rotation angle</div>
+<div><strong>positionOut (output)</strong>: the position component of the rotated transformation (x, y, z)</div>
+<div><strong>quaternionOut (output)</strong>: the orientation component of the rotated transformation (x, y, z, w)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbSetIkElementProperties" id="simEmbSetIkElementProperties"></a>simEmbSetIkElementProperties (regular API equivalent: <a href="regularApi/simSetIkElementProperties.htm">sim.setIkElementProperties</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Sets properties of a specific IK element. See also <a href="#simEmbSetIkGroupProperties">simEmbSetIkGroupProperties</a> and <a href="#simEmbGetIkGroupHandle">simEmbGetIkGroupHandle</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbSetIkElementProperties(int ikGroupHandle,int tipDummyHandle,int constraints,const real* precision,const real* weight)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>ikGroupHandle (input)</strong>: handle of the IK group</div>
+<div><strong>tipDummyHandle (input)</strong>: handle of the tip dummy object of the IK element</div>
+<div><strong>constraints (input)</strong>: the <a href="apiConstants.htm#ikConstraints">constraints</a> of the ik element. sim_ik_avoidance_constraint is not allowed</div>
+<div><strong>precision (input)</strong>: an array of two values where the first represents the linear precision,   and the second the angular precision. Can be NULL to keep current   settings.</div>
+<div><strong>weight (input)</strong>: an array of two values that represent the linear and angular resolution weights. Can be NULL to keep current settings</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbSetIkGroupExplicitHandling" id="simEmbSetIkGroupExplicitHandling"></a>simEmbSetIkGroupExplicitHandling (regular API equivalent: <a href="regularApi/simSetExplicitHandling.htm">sim.setExplicitHandling</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Sets the explicit handling flags for an IK group. An IK group flagged as &quot;explicit handling&quot; will only be handled or solved when called explicitely with <a href="#simEmbHandleIkGroup">simEmbHandleIkGroup</a>(ikGroupHandle) or simEmbHandleIkGroup(sim_handle_all).</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbSetIkGroupExplicitHandling(int ikGroupHandle,bool explicitHandling)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>ikGroupHandle (input)</strong>: handle of the IK group</div>
+<div><strong>explicitHandling (input)</strong>: the desired explicit handling state</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbSetIkGroupProperties" id="simEmbSetIkGroupProperties"></a>simEmbSetIkGroupProperties (regular API equivalent: <a href="regularApi/simSetIkGroupProperties.htm">sim.setIkGroupProperties</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Sets properties of an IK group. See also <a href="#simEmbSetIkElementProperties">simEmbSetIkElementProperties</a></td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbSetIkGroupProperties(int ikGroupHandle,int resolutionMethod,int maxIterations,real damping)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>ikGroupHandle (input)</strong>: handle of the IK group</div>
+<div><strong>resolutionMethod (input)</strong>: the <a href="apiConstants.htm#ikCalculationMethods">IK resolution method</a></div>
+<div><strong>maxIterations (input)</strong>: the maximum number of iterations for the calculations</div>
+<div><strong>damping (input)</strong>: the DLS damping factor</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbSetJointInterval" id="simEmbSetJointInterval"></a>simEmbSetJointInterval (regular API equivalent: <a href="regularApi/simSetJointInterval.htm">sim.setJointInterval</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Sets the limits of a joint. See also <a href="#simEmbGetJointInterval">simEmbGetJointInterval</a></td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbSetJointInterval(int jointHandle,int cyclic,real* interval)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>jointHandle (input)</strong>: handle of the joint</div>
+<div><strong>cyclic (input)</strong>: 1 if the joint should be cyclic (i.e. without limits), 0 otherwise.</div>
+<div><strong>interval (input)</strong>: pointer to 2 values: the low limit, and the range (i.e. highLimit = lowLimit + range).</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed.</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbSetJointMode" id="simEmbSetJointMode"></a>simEmbSetJointMode (regular API equivalent: <a href="regularApi/simSetJointMode.htm">sim.setJointMode</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Sets the operation mode of a joint. Might have as side-effect the change of additional properties of the joint.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbSetJointMode(int jointHandle,int jointMode)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>jointHandle (input)</strong>: handle of the joint</div>
+<div><strong>jointMode (input)</strong>: a <a href="apiConstants.htm#jointModes">joint mode</a> value</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbSetJointPosition" id="simEmbSetJointPosition"></a>simEmbSetJointPosition (regular API equivalent: <a href="regularApi/simSetJointPosition.htm">sim.setJointPosition</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Sets the intrinsic position of a joint. This function cannot be used with spherical joints (use <a href="#simEmbSetSphericalJointQuaternion">simEmbSetSphericalJointQuaternion</a> instead). See also <a href="#simEmbGetJointPosition">simEmbGetJointPosition</a></td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbSetJointPosition(int jointHandle,real position)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>jointHandle (input)</strong>: handle of the joint</div>
+<div><strong>position (input)</strong>: position of the joint (angular or linear value depending on the joint type)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbSetObjectParent" id="simEmbSetObjectParent"></a>simEmbSetObjectParent (regular API equivalent: <a href="regularApi/simSetObjectParent.htm">sim.setObjectParent</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Sets an  object's parent object. See also <a href="#simEmbGetObjectParent">simEmbGetObjectParent</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbSetObjectParent(int objectHandle,int parentObjectHandle,bool keepInPlace)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>objectHandle (input)</strong>: handle of the object that will become child of the parent object</div>
+<div><strong>parentObjectHandle (input)</strong>: handle of the object that will become parent, or -1 if the object should become parentless</div>
+<div><strong>keepInPlace (input)</strong>: indicates whether the object's absolute position and orientation should stay same</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbSetObjectMatrix" id="simEmbSetObjectMatrix"></a>simEmbSetObjectMatrix (regular API equivalent: <a href="regularApi/simSetObjectMatrix.htm">sim.setObjectMatrix</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Sets the matrix of an object. See also <a href="#simEmbGetObjectMatrix">simEmbGetObjectMatrix</a> and <a href="#simEmbSetObjectTransformation">simEmbSetObjectTransformation</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbSetObjectMatrix(int objectHandle,int relativeToObjectHandle,const real* matrix)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>objectHandle (input)</strong>: handle of the object</div>
+<div><strong>relativeToObjectHandle (input)</strong>: indicates relative to which reference frame the transformation is specified. Specify -1 to set the absolute transformation, sim_handle_parent   to set the transformation relative to the object's parent, or an   object handle relative to whose reference frame the transformation   is specified.</div>
+<div><strong>matrix (input)</strong>: the matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbSetObjectTransformation" id="simEmbSetObjectTransformation"></a>simEmbSetObjectTransformation (regular API equivalent: <a href="regularApi/simSetObjectMatrix.htm">sim.setObjectMatrix</a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Sets the transformation (position / orientation) of an object. See also <a href="#simEmbGetObjectTransformation">simEmbGetObjectTransformation</a> and <a href="#simEmbSetObjectMatrix">simEmbSetObjectMatrix</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbSetObjectTransformation(int objectHandle,int relativeToObjectHandle,const real* position,const real* quaternion)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>objectHandle (input)</strong>: handle of the object</div>
+<div><strong>relativeToObjectHandle (input)</strong>: indicates relative to which reference frame the transformation is specified. Specify -1 to set the absolute transformation, sim_handle_parent   to set the transformation relative to the object's parent, or an   object handle relative to whose reference frame the transformation   is specified.</div>
+<div><strong>position (input)</strong>: the position component of the transformation (x, y, z)</div>
+<div><strong>quaternion (input)</strong>: the orientation component of the transformation (x, y, z, w)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbSetSphericalJointMatrix" id="simEmbSetSphericalJointMatrix"></a>simEmbSetSphericalJointMatrix (regular API equivalent: <a href="regularApi/simSetSphericalJointMatrix.htm">sim.setSphericalJointMatrix </a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Sets the intrinsic matrix of a spherical joint object. This function cannot be used with non-spherical joints (use <a href="#simEmbSetJointPosition">simEmbSetJointPosition</a> instead). See also <a href="#simEmbGetJointMatrix">simEmbGetJointMatrix</a> and <a href="#simEmbSetSphericalJointQuaternion">simEmbSetSphericalJointQuaternion</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbSetSphericalJointMatrix(int jointHandle,const real* matrix)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>jointHandle (input)</strong>: handle of the joint</div>
+<div><strong>matrix (input)</strong>: the matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted))</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbSetSphericalJointQuaternion" id="simEmbSetSphericalJointQuaternion"></a>simEmbSetSphericalJointQuaternion (regular API equivalent: <a href="regularApi/simSetSphericalJointMatrix.htm">sim.setSphericalJointMatrix </a>) </h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Sets the intrinsic quaternion of a spherical joint object. This function cannot be used with non-spherical joints (use <a href="#simEmbSetJointPosition">simEmbSetJointPosition</a> instead). See also <a href="#simEmbGetJointTransformation">simEmbGetJointTransformation</a> and <a href="#simEmbSetSphericalJointMatrix">simEmbSetSphericalJointMatrix</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbSetSphericalJointQuaternion(int jointHandle,const real* quaternion)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>jointHandle (input)</strong>: handle of the joint</div>
+<div><strong>quaternion (input)</strong>: the quaternion (x, y, z, w)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbShutDown" id="simEmbShutDown"></a>simEmbShutDown
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Deinitializes the active instance of the external kinematics routines. Should be the very last function called. See also <a href="#simEmbLaunch">simEmbLaunch</a> and <a href="#simEmbSwitch">simEmbSwitch</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbShutDown()</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div>none</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed, otherwise the handle of the newly active instance (or 0 if there is no active instance left).</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbStart" id="simEmbStart"></a>simEmbStart
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Imports a previously exported kinematic scene content. Can be called at any time to reset the object/joint configurations.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbStart(unsigned char* data,int dataLength)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>data (input)</strong>: pointer to the data to import</div>
+<div><strong>dataLength (input)</strong>: the size of the data to import</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed, otherwise the number of imported objects</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbSwitch" id="simEmbSwitch"></a>simEmbSwitch
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Switches to another instance of an exported kinematic scene content. See also <a href="#simEmbLaunch">simEmbLaunch</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>bool simEmbSwitch(int instanceHandle)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>instanceHandle (input)</strong>: the handle of a kinematic scene content instance, previously returned from <a href="#simEmbLaunch">simEmbLaunch</a>.</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>false if operation failed.</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3 class=subsectionBar>
+<a name="simEmbTransformationToMatrix" id="simEmbTransformationToMatrix"></a>simEmbTransformationToMatrix
+</h3>
+
+<table class=apiTable>
+<tr class=apiTableTr> 
+<td class=apiTableLeftDescr>
+Description 
+</td> 
+<td class=apiTableRightDescr>Retrieves a matrix from a position and a quaternion. See also <a href="#simEmbMatrixToTransformation">simEmbMatrixToTransformation</a> and <a href="#simEmbEulerAnglesToQuaternion">simEmbEulerAnglesToQuaternion</a>.</td>
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCSyn>
+C++ synopsis
+</td> 
+<td class=auxApiTableRightCSyn>int simEmbTransformationToMatrix(const real* position,const real* quaternion,real* matrix)</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCParam>parameters</td> 
+<td class=auxApiTableRightCParam>
+<div><strong>position (input)</strong>: the 3 values of a position (x, y, z)</div>
+<div><strong>quaternion (input)</strong>: the 4 values of a quaternion (x, y, z, w)</div>
+<div><strong>matrix (output)</strong>: the matrix (Xx, Yx, Zx, Px, Xy, Yy, Zy, Py, Xz, Yz, Zz, Pz. (last row, i.e. 0, 0, 0, 1 is omitted)</div>
+</td> 
+</tr> 
+<tr class=apiTableTr> 
+<td class=auxApiTableLeftCRet>
+return value
+</td> 
+<td class=auxApiTableRightCRet>
+<div>-1 if operation failed</div>
+</td> 
+</tr> 
+</table> 
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+<br>
+ </tr>
+</table> 
+</div>  
+  
+  
+</body>
+
+</html>

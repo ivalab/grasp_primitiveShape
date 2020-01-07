@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Script simulation parameters</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>Script simulation parameters</h1>
+
+
+<p>The <a href="mainScript.htm">main script</a> and each <a href="childScripts.htm">child script</a> have a list of simulation parameters. Those parameters can be used as a quick way of adjusting values of a specific <a href="models.htm">model</a> for example (e.g. the maximum velocity of a mobile robot or the resolution of a sensor). The script simulation parameters for a script can be accessed by double-clicking the appropriate icon in the <a href="userInterface.htm#SceneHierarchy">scene hierarchy</a>:<br>
+</p>
+
+<p align=center><img src="images/scriptSimParams1.jpg"></p>
+<p class=imageLabel>[Script simulation parameter icons (1) empty parameter list, (2) non-empty parameter list]</p>
+<br>
+
+
+<p align=center><img src="images/scriptSimParams2.jpg"></p>
+<p class=imageLabel>[Script simulation parameters dialog]</p>
+<br>
+
+<p>If the user modifies a value in the parameter list, scripts can react to that modification and adjust their behavior accordingly. A script can use the <a href="regularApi/simGetScriptSimulationParameter.htm">sim.getScriptSimulationParameter</a> function to retrieve the value of a parameter, or the <a href="regularApi/simSetScriptSimulationParameter.htm">sim.setScriptSimulationParameter</a> function to modify the value of a parameter. Script simulation parameters can  also be used for specific inter-script messaging purposes.<br>
+</p>
+
+<p>Items in the script simulation parameters dialog are briefly described hereafter: <br>
+</p>
+
+<li><strong>Add new parameter</strong>: adds a new parameter to the list.<br>
+</li>
+
+<li><strong>Script parameters</strong>: list of parameters. Individual parameters can be renamed with a double-click, and their values modified.<br>
+</li>
+
+<li><strong>Value</strong>: string value of the parameter. The string can contain any value, including embedded zeros.<br>
+</li>
+
+<li><strong>Unit</strong>: the unit of the value (if applicable). The unit is merely intended to inform the user.<br>
+</li>
+
+<li><strong>Parameter is private</strong>: if enabled, then the selected parameter is not shown during a simulation (in that case the parameter is probably not meant to be modified during a simulation).<br>
+</li>
+
+<li><strong>Parameter is persistent</strong>: if enabled, then the selected parameter will not be restored to its original value at simulation end.<br>
+</li>
+
+<br>
+<h3 class=recommendedTopics>Recommended topics</h3>
+
+<li><a href="apiFunctionListCategory.htm#scriptSimulationParameters">Related API functions</a></li>
+<li><a href="mainScript.htm">The main script</a></li>
+<li><a href="childScripts.htm">Child scripts</a></li>
+<br>
+<br>
+ </tr>
+</table> 
+</div>  
+  
+  
+</body>
+
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>ROS Interface</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>RosInterface</h1>
+
+<p>The RosInterface is part of the <a href="apisOverview.htm">V-REP API framework</a> and  is courtesy of Federico Ferri. Make sure not to mix up the RosInterface with the <em>RosPlugin</em>, which is an older, deprecated interface in V-REP. The RosInterface duplicates the C/C++ ROS API with a good fidelity. This makes it the ideal choice for very flexible communication via ROS, but might require a little bit more insight on the various messages and the way ROS operates. You can recognize RosInterface API functions from the <em>simROS.</em> -prefix.</p>
+
+<p>ROS is a distributed pseudo operating system allowing for easy management and communication between multiple computers connected in a network. Please refer to the <a href="http://www.ros.org">official ROS documentation</a> for details about ROS.</p>
+
+<p>V-REP can act as a ROS node that other nodes can communicate with via ROS services, ROS publishers and ROS subscribers.</p>
+
+<p>The RosInterface functionality in V-REP is enabled via a plugin: <em>libv_repExtRosInterface.so</em> or <em>libv_repExtRosInterface.dylib</em>. The code to the plugin can be found <a href="https://github.com/CoppeliaRobotics/v_repExtRosInterface" target="_blank">here</a>. The plugin can easily be adapted to your own needs. The plugin is loaded when V-REP is launched, but the load operation will only be successful if roscore was running at that time. Make sure to inspect V-REP's console window or terminal for details on plugin load operations.</p>
+
+<p>Have a look at following simulation scenes/model for a quick start with the RosInterface:</p>
+
+<li><em>rosInterfaceTopicPublisherAndSubscriber.ttt</em></li>
+<li><em>controlTypeExamples.ttt</em> (focus on the red robot)</li>
+<li><em>Models/tools/rosInterface helper tool.ttm</em> (model allowing to operate V-REP in Synchronous mode, e.g. in order to manually step the simulation)</li>
+
+
+<p>Also have a look at the <a href="rosTutorial.htm">ROS tutorial</a> and the <a href="externalControllerTutorial.htm">external controller tutorial</a>.</p>
+
+
+<br>
+<br>
+<h3 class=recommendedTopics>Recommended topics</h3>
+<li><a href="rosInterfaceApi.htm">RosInterface API functions</a></li>
+<li><a href="rosTutorial.htm">ROS tutorial</a></li>
+<br>
+<br>
+ </tr>
+</table> 
+</div>  
+  
+  
+</body>
+
+</html>

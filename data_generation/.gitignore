@@ -1,0 +1,7 @@
+logs/*
+*.ply
+objects/block_gen*
+.vscode
+*.pyc
+.idea
+useless
