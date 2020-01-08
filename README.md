@@ -96,7 +96,7 @@ where XXX is the name of the test data folder; 0 refers to the order number of t
 (It will generate the predicted mask label **predict_mask_img_bin_XX_XX.png**, predicted mask area **predict_mask_img_black_white_XX_XX.png** and the visualized result **visualized_image_XX.png**.)
    
 ## Citations
-Please cite Primitive_Shapes if you use this repository in your publications:
+Please cite grasp_primitiveShape if you use this repository in your publications:
 
 ```
 @article{lin2019primitiveShapes,
