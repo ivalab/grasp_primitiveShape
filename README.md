@@ -6,7 +6,7 @@
 
 
 ## Overview
-This repository is the implementation code of the paper "Using  Synthetic  Data  and  Deep  Networks to  Recognize  Primitive  Shapes  for  Object  Grasping" ([arXiv](https://arxiv.org/abs/1909.08508), [Project](https://sites.google.com/view/primitive-shape-grasping), [Video](https://www.youtube.com/watch?v=AZuLpEzQMYQ&feature=emb_logo)) by Lin et al. at [IVALab](https://ivalab.gatech.edu/), [Gatech](https://www.gatech.edu/). The algorithm takes a depth image as input and predicts the best grasp of each object in the frame. We employ the [PyTorch-version MaskR-CNN](https://github.com/facebookresearch/maskrcnn-benchmark) network developed by facebook and the rest of the framework is in Python and Matlab. In this repo, we provide our full implementation code of the data generation, data preprocessing and a modified version of the Mask R-CNN model. The ROS code of the real robot grasping experiment is not included. It will be provided in another repository shortly.
+This repository is the implementation code of the paper "Using  Synthetic  Data  and  Deep  Networks to  Recognize  Primitive  Shapes  for  Object  Grasping" ([arXiv](https://arxiv.org/abs/1909.08508), [Project](https://sites.google.com/view/primitive-shape-grasping), [Video](https://www.youtube.com/watch?v=AZuLpEzQMYQ&feature=emb_logo)) by Lin et al. at [IVALab](https://ivalab.gatech.edu/), [Gatech](https://www.gatech.edu/). The algorithm takes a depth image as input and predicts the best grasp of each object in the frame. We employ the [PyTorch-version MaskR-CNN](https://github.com/facebookresearch/maskrcnn-benchmark) network developed by facebook and the rest of the framework is in Python and Matlab. In this repo, we provide our full implementation code of the data generation, data preprocessing and a modified version of the Mask R-CNN model. 
 
 ## Requirements
 - Python 3.5
@@ -99,11 +99,13 @@ where XXX is the name of the test data folder; 0 refers to the order number of t
 Please cite grasp_primitiveShape if you use this repository in your publications:
 
 ```
-@article{lin2019primitiveShapes,
-  title={Using Synthetic Data and Deep Networks to Recognize Primitive Shapes for Object Grasping},
+@inproceedings{lin2020using,
+  title={Using synthetic data and deep networks to recognize primitive shapes for object grasping},
   author={Lin, Yunzhi and Tang, Chao and Chu, Fu-Jen and Vela, Patricio A},
-  journal={arXiv preprint arXiv:1909.08508},
-  year={2019}
+  booktitle={2020 IEEE International Conference on Robotics and Automation (ICRA)},
+  pages={10494--10501},
+  year={2020},
+  organization={IEEE}
 }
 ```
 
