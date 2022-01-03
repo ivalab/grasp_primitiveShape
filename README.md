@@ -10,7 +10,7 @@ This repository is the official implementation code of our paper "Primitive Shap
 
 We will provide the full implementation code of the data generation, data preprocessing, a modified version of the Mask R-CNN model, and a RANSAC-based shape fitting module.
 
-For more details about our RANSAC-based shape fitting part, please refer to the supplementary material ([PDF](assets/Supplementary Information.pdf)).
+For more details about our RANSAC-based shape fitting part, please refer to the supplementary material ([PDF](assets/SupplementaryInfo.pdf)).
 
 ## Licence
 
